@@ -2,16 +2,16 @@
   <div class="col-sm-6 col-md-4">
     <div class="panel panel-success">
       <div class="panel-heading">
-        <h3 class="panel-title">{{ stockName }} <small>(Price: {{ stockPrice }})</small></h3>
+        <h3 class="panel-title">{{ stockData.name }} <small>(Price: {{ stockData.price }})</small></h3>
       </div>
 
       <div class="panel-body">
         <div class="pull-left">
-          <input type="number" class="form-control" placeholder="Quantity" v-model.number="quantity">
+          <input type="number" class="form-control" :class="{ danger: insufficientFunds }" placeholder="Quantity" v-model.number="quantity">
         </div>
 
         <div class="pull-right">
-          <button class="btn btn-success" @click="buyStock" :disabled="quantity <= 0 || !Number.isInteger(quantity)">Buy</button>
+          <button class="btn btn-success" @click="buyStock" :disabled="insufficientFunds || quantity <= 0 || !Number.isInteger(quantity)">{{ insufficientFunds ? 'Insufficient Funds' : 'Buy' }}</button>
         </div>
       </div>
     </div>
@@ -23,19 +23,25 @@
     props: ['stockData'],
     data() {
       return {
-        stockId: this.stockData.id,
-        stockName: this.stockData.name,
-        stockPrice: this.stockData.price,
         quantity: 0
       };
+    },
+    computed: {
+      funds() {
+        return this.$store.getters.funds;
+      },
+      insufficientFunds() {
+        return this.stockData.price * this.quantity > this.funds;
+      }
     },
     methods: {
       buyStock() {
         const order = {
-          id: this.stockId,
-          price: this.stockPrice,
-          quantity: this.quantity,
-          name: this.stockName
+          id: this.stockData.id,
+          name: this.stockData.name,
+          price: this.stockData.price,
+          quantity: this.quantity
+          
         };
 
         //console.log(order);
@@ -48,4 +54,8 @@
   }
 </script>
 
-<style></style>
+<style scoped>
+.danger {
+  border: 1px solid red;
+}
+</style>

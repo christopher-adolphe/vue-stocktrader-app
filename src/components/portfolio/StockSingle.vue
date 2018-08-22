@@ -1,17 +1,17 @@
 <template>
   <div class="col-sm-6 col-md-4">
-    <div class="panel panel-success">
+    <div class="panel panel-info">
       <div class="panel-heading">
-        <h3 class="panel-title">{{ stockName }} <small>(Price: {{ stockPrice }} | Quantity: {{ quantity }})</small></h3>
+        <h3 class="panel-title">{{ stockData.name }} <small>(Price: {{ stockData.price }} | Quantity: {{ stockData.quantity }})</small></h3>
       </div>
 
       <div class="panel-body">
         <div class="pull-left">
-          <input type="number" class="form-control" placeholder="Quantity" v-model.number="quantity">
+          <input type="number" class="form-control" :class="{ danger: insufficentQuantity }" placeholder="Quantity" v-model.number="sellQuantity">
         </div>
 
         <div class="pull-right">
-          <button class="btn btn-success" @click="sellStock" :disabled="quantity <= 0 || !Number.isInteger(quantity)">Sell</button>
+          <button class="btn btn-success" @click="sellStock" :disabled="insufficentQuantity || sellQuantity <= 0 || !Number.isInteger(sellQuantity)">{{ insufficentQuantity ? 'Not enough' : 'Sell' }}</button>
         </div>
       </div>
     </div>
@@ -25,32 +25,36 @@
     props: ['stockData'],
     data() {
       return {
-        stockId: this.stockData.id,
-        stockName: this.stockData.name,
-        stockPrice: this.stockData.price,
-        quantity: 0
+        sellQuantity: 0
       };
     },
+    computed: {
+      insufficentQuantity() {
+        return this.sellQuantity > this.stockData.quantity;
+      }
+    },
     methods: {
-      ...mapActions([
-        'sellStock'
-      ]),
+      ...mapActions({
+        placeSellingOrder: 'sellStock'
+      }),
       sellStock() {
         const order = {
-          id: this.stockId,
-          price: this.stockPrice,
-          quantity: this.quantity,
-          name: this.stockName
+          id: this.stockData.id,
+          name: this.stockData.name,
+          price: this.stockData.price,
+          quantity: this.sellQuantity
         };
 
-        //console.log(order);
+        this.placeSellingOrder(order);
 
-        this.$store.dispatch('buyStock', order);
-
-        this.quantity = 0;
+        this.sellQuantity = 0;
       }
     }
   }
 </script>
 
-<style></style>
+<style scoped>
+.danger {
+  border: 1px solid red;
+}
+</style>

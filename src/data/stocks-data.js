@@ -23,5 +23,10 @@ export default [
     id: 5,
     name: 'Mazda RX7 Quad Rotor',
     price: 2400
+  },
+  {
+    id: 6,
+    name: 'Adidas Super Star sneaker',
+    price: 3200
   }
 ];

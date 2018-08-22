@@ -4,17 +4,22 @@ const state = {
 };
 
 const mutations = {
-  'BUY_STOCK' (state, {id, price, quantity, name}) {
+  'SET_PORTFOLIO' (state, portfolio) {
+    state.funds = portfolio.funds;
+    state.stocks = portfolio.stockPortfolio ? portfolio.stockPortfolio : [];
+  },
+  'BUY_STOCK' (state, {id, price, name, quantity}) {
     const record = state.stocks.find(element => element.id == id);
 
+    // If the record already exists, only update the quantity
     if (record) {
       record.quantity += quantity;
     }
+    // Else add the order to the portfolio stocks array
     else {
       state.stocks.push({
-        stockID: id,
-        stockQty: quantity,
-        stockName: name
+        id: id,
+        quantity: quantity
       });
     }
 
@@ -22,7 +27,7 @@ const mutations = {
   },
   'SELL_STOCK' (state, {id, price, quantity}) {
     const record = state.stocks.find(element => element.id == id);
-
+    
     if (record.quantity > quantity) {
       record.quantity -= quantity
     }
@@ -35,7 +40,7 @@ const mutations = {
 };
 
 const actions = {
-  sellStocks({commit}, order) {
+  sellStock: ({commit}, order) => {
     commit('SELL_STOCK', order);
   }
 };

@@ -1,14 +1,18 @@
-import stocksData from '../../data/stocks-data.js';
+import stocks from '../../data/stocks-data.js';
 
 const state = {
   stocks: []
 };
 
 const mutations = {
-  'SET_STOCKS' (state, stocksData) {
-    state.stocks = stocksData;
+  'SET_STOCKS' (state, stocks) {
+    state.stocks = stocks;
   },
-  'RAND_STOCKS' (state) {}
+  'RAND_STOCKS' (state) {
+    state.stocks.forEach(stock => {
+      stock.price = Math.round(stock.price * (1 + Math.random() - 0.5));
+    });
+  }
 };
 
 const actions = {
@@ -17,7 +21,7 @@ const actions = {
     commit('BUY_STOCK', order);
   },
   initStocks: ({commit}) => {
-    commit('SET_STOCKS', stocksData);
+    commit('SET_STOCKS', stocks);
   },
   randomizeStocks: ({commit}) => {
     commit('RAND_STOCKS');
